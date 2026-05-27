@@ -1,0 +1,18 @@
+.venv/
+.venv2/
+__pycache__/
+build/
+dist/
+*.pyc
+*.pyo
+*.pyd
+.env
+uploads/*
+Informes/*
+output/*
+!uploads/.gitkeep
+!Informes/.gitkeep
+!output/.gitkeep
+"informes 2026"/
+informes 2026/
+

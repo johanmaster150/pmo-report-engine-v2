@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JAGA TECH | Motor V5 Grok Reasoning</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap');
+        body { font-family: 'Outfit', system-ui, sans-serif; background: #0f172a; background: radial-gradient(circle at 15% 50%, #17103a 0%, #080f1e 50%, #020617 100%); background-attachment: fixed; color: #f8fafc; min-height: 100vh; display: flex; flex-direction: column; }
+        .glass-panel { background: rgba(15,23,42,0.45); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px); border: 1px solid rgba(255,255,255,0.08); box-shadow: 0 25px 50px -12px rgba(0,0,0,0.6); border-radius: 1.5rem; }
+        .dropzone { background: rgba(255,255,255,0.02); border: 2px dashed rgba(255,255,255,0.15); transition: all 0.3s cubic-bezier(0.4,0,0.2,1); }
+        .dropzone:hover { border-color: #f59e0b; background: rgba(245,158,11,0.05); transform: scale(1.01); }
+        .file-item { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05); border-radius: 0.75rem; transition: all 0.2s ease-out; }
+        .file-item:hover { transform: translateX(4px) translateY(-2px); background: rgba(255,255,255,0.08); border-color: rgba(245,158,11,0.4); }
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: rgba(0,0,0,0.1); border-radius: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 4px; }
+        .dot { transition: all 0.3s cubic-bezier(0.4,0,0.2,1); }
+        input:checked~.dot { transform: translateX(100%); background-color: #fff; }
+        input:checked~.block { background-color: #f59e0b; border-color: #f59e0b; }
+        .text-gradient { background-clip: text; -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-image: linear-gradient(135deg, #f59e0b, #ef4444); }
+        .glow-button { position: relative; overflow: hidden; transition: all 0.3s ease; }
+        .glow-button::before { content: ''; position: absolute; top: 0; left: -150%; width: 100%; height: 100%; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.25), transparent); transform: skewX(-20deg); transition: all 0.6s ease; }
+        .glow-button:hover::before { left: 150%; }
+        .bg-orb { position: fixed; border-radius: 50%; filter: blur(80px); z-index: -1; animation: float 20s infinite alternate; }
+        .bg-orb-1 { width: 400px; height: 400px; background: rgba(245,158,11,0.12); top: -100px; left: -100px; }
+        .bg-orb-2 { width: 500px; height: 500px; background: rgba(239,68,68,0.08); bottom: -200px; right: -100px; animation-delay: -10s; }
+        @keyframes float { 0% { transform: translate(0,0) scale(1); } 50% { transform: translate(50px,30px) scale(1.1); } 100% { transform: translate(-30px,-50px) scale(0.9); } }
+    </style>
+</head>
+<body class="antialiased font-sans">
+    <!-- Nav Banner -->
+    <div class="w-full bg-amber-900/50 text-amber-200 text-center py-2 text-sm font-semibold tracking-wide border-b border-amber-500/30">
+        &#x1F9E0; MOTOR V5 — Grok 4.1 Fast Reasoning + Pipeline 3 Fases
+        <a href="/" class="ml-3 text-emerald-400 hover:text-emerald-300 underline">V1</a>
+        <a href="/v2" class="ml-3 text-blue-400 hover:text-blue-300 underline">V2</a>
+        <a href="/v3" class="ml-3 text-purple-400 hover:text-purple-300 underline">V3</a>
+        <a href="/v4" class="ml-3 text-fuchsia-400 hover:text-fuchsia-300 underline">V4</a>
+    </div>
+    <!-- Orbs -->
+    <div class="bg-orb bg-orb-1"></div>
+    <div class="bg-orb bg-orb-2"></div>
+    <!-- Header -->
+    <header class="w-full relative py-4 px-6 md:px-10 flex items-center justify-between border-b border-white/5 bg-black/30 backdrop-blur-2xl z-20 shadow-[0_4px_30px_rgba(0,0,0,0.5)]">
+        <div class="flex items-center gap-5">
+            <div class="w-14 h-14 md:w-16 md:h-16 rounded-xl bg-gradient-to-br from-white to-[#e2e8f0] flex items-center justify-center shadow-lg overflow-hidden group">
+                <img src="/static/logo.png" alt="JAGA" class="object-contain w-[85%] h-[85%] group-hover:scale-110 transition-transform" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                <span style="display:none;" class="font-extrabold text-slate-900 text-sm">JAGA</span>
+            </div>
+            <div class="flex flex-col">
+                <h1 class="text-2xl md:text-3xl font-bold tracking-tight text-white mb-0.5">Report <span class="text-gradient">Engine V5</span></h1>
+                <p class="text-[0.65rem] md:text-[0.70rem] text-amber-300/80 font-bold tracking-[0.2em] uppercase">Grok 4.1 Fast &#x2022; Reasoning &#x2022; Pipeline 3 Fases</p>
+            </div>
+        </div>
+        <div class="hidden sm:flex items-center gap-3">
+            <div class="px-3 py-1.5 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-300 text-xs font-semibold tracking-wider flex items-center">
+                <span class="w-2 h-2 rounded-full bg-amber-400 mr-2 animate-pulse"></span>GROK V5 ACTIVO
+            </div>
+        </div>
+    </header>
+    <!-- Main -->
+    <main class="flex-grow max-w-[1440px] w-full mx-auto p-4 sm:p-6 md:p-8 flex flex-col items-center z-10 mt-4">
+        <div class="w-full grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 flex-grow items-stretch">
+            <!-- Left Panel -->
+            <div class="glass-panel col-span-1 lg:col-span-5 p-6 sm:p-8 flex flex-col h-full relative overflow-hidden">
+                <h2 class="text-xl font-bold mb-2 text-white flex items-center relative z-10">
+                    <div class="bg-amber-500/10 p-2.5 rounded-xl mr-3 border border-amber-500/20"><svg class="w-5 h-5 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2" ry="2" stroke-width="2"></rect><line x1="9" y1="3" x2="9" y2="21" stroke-width="2"></line></svg></div>
+                    Arquitectura V5
+                </h2>
+                <p class="text-sm text-slate-400/90 mb-4 font-medium z-10">Strip &#x2192; Rebuild &#x2192; Renumber</p>
+                <!-- Pipeline Info -->
+                <div class="mb-5 z-10 rounded-xl p-4 bg-gradient-to-br from-amber-900/20 to-red-900/10 border border-amber-500/20">
+                    <p class="text-xs text-amber-200/90 font-semibold mb-2 uppercase tracking-wider">Pipeline V5</p>
+                    <div class="space-y-2 text-xs text-slate-300/90 font-medium">
+                        <div class="flex items-center"><span class="w-5 h-5 rounded-full bg-red-500/20 text-red-400 flex items-center justify-center text-[10px] font-bold mr-2">1</span>Borrar formatos, t&#xED;tulos, numeraciones</div>
+                        <div class="flex items-center"><span class="w-5 h-5 rounded-full bg-amber-500/20 text-amber-400 flex items-center justify-center text-[10px] font-bold mr-2">2</span>Reconstruir t&#xED;tulos (1.1-1.7, 2.1-2.4, 3.1)</div>
+                        <div class="flex items-center"><span class="w-5 h-5 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-[10px] font-bold mr-2">3</span>Numerar tablas por secci&#xF3;n (X.Y.Z)</div>
+                    </div>
+                </div>
+                <!-- Template Upload -->
+                <div id="template-dropzone" class="dropzone rounded-2xl p-8 mb-6 flex flex-col items-center justify-center cursor-pointer relative shadow-inner z-10 min-h-[120px]">
+                    <input type="file" id="template-input" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-50" accept=".docx" />
+                    <div class="bg-white/5 p-4 rounded-full mb-3"><svg class="w-7 h-7 text-amber-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path></svg></div>
+                    <span class="text-amber-200 font-medium text-center text-sm" id="template-name">Base_Unificada.docx (Subir)</span>
+                </div>
+                <!-- Mode -->
+                <div class="mb-5 z-10">
+                    <label class="block text-sm font-semibold text-slate-300 mb-2 uppercase tracking-wide">Enrutamiento</label>
+                    <select id="assembly-mode-select" class="bg-black/40 border border-slate-700/60 text-slate-200 text-sm rounded-xl w-full px-4 py-3 outline-none cursor-pointer">
+                        <option value="unified">Est&#xE1;ndar (Secuencial Unificado)</option>
+                        <option value="split">Dividido (Paralelo)</option>
+                    </select>
+                    <div id="mode-unified-desc" class="bg-amber-900/10 border border-amber-500/10 rounded-xl p-3 mt-3"><p class="text-[0.8rem] text-slate-400 font-medium">V5: Strip &#x2192; Rebuild &#x2192; Renumber &#x2192; TOC.</p></div>
+                    <div id="mode-split-desc" class="hidden bg-fuchsia-900/10 border border-fuchsia-500/10 rounded-xl p-3 mt-3"><p class="text-[0.8rem] text-fuchsia-200/80 font-medium">Separaci&#xF3;n por fases.</p></div>
+                </div>
+                <div id="template2-container" class="mb-5 hidden dropzone rounded-2xl p-6 flex-col items-center justify-center cursor-pointer relative min-h-[100px]">
+                    <input type="file" id="template2-input" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-50" accept=".docx" />
+                    <span class="text-fuchsia-300 font-semibold text-sm" id="template2-name">Plantilla Pago 2</span>
+                </div>
+                <!-- Font -->
+                <div class="mb-5 z-10 rounded-xl p-4 bg-white/5 border border-white/5">
+                    <label class="block text-sm font-semibold text-slate-300 mb-2 uppercase tracking-wide">Tipograf&#xED;a</label>
+                    <span class="text-xs text-emerald-400 mb-2 block font-medium">&#x2713; Auto-limpieza de fondos activada.</span>
+                    <select id="font-family-select" class="bg-black/40 border border-slate-700/60 text-slate-200 text-sm rounded-xl w-full px-4 py-3 outline-none cursor-pointer">
+                        <option value="default">Por defecto</option>
+                        <option value="Arial">Arial</option>
+                        <option value="Calibri">Calibri</option>
+                        <option value="Times New Roman">Times New Roman</option>
+                        <option value="Verdana">Verdana</option>
+                        <option value="Tahoma">Tahoma</option>
+                    </select>
+                </div>
+                <!-- Export -->
+                <div class="mb-5 z-10 rounded-xl p-4 bg-white/5 border border-white/5">
+                    <label class="block text-sm font-semibold text-slate-300 mb-2 uppercase tracking-wide">Formato</label>
+                    <select id="export-format-select" class="bg-black/40 border border-slate-700/60 text-slate-200 text-sm rounded-xl w-full px-4 py-3 outline-none cursor-pointer">
+                        <option value="both">Word + PDF</option>
+                        <option value="pdf">Solo PDF</option>
+                        <option value="word">Solo Word</option>
+                    </select>
+                </div>
+                <div class="flex-grow"></div>
+                <!-- AI Toggle -->
+                <div class="mt-4 p-5 rounded-2xl bg-gradient-to-br from-[#3b1a0a] to-[#1a0a02] border border-amber-500/30 z-10 shadow-lg">
+                    <label class="flex items-start cursor-pointer">
+                        <div class="relative mt-1">
+                            <input type="checkbox" id="ai-toggle" class="sr-only">
+                            <div class="block bg-slate-800 border border-slate-700 w-12 h-6 rounded-full"></div>
+                            <div class="dot absolute left-1 top-1 bg-white w-4 h-4 rounded-full shadow-md"></div>
+                        </div>
+                        <div class="ml-4 flex flex-col">
+                            <span class="text-sm font-bold bg-clip-text text-transparent bg-gradient-to-r from-amber-400 to-red-400">Grok 4.1 Fast Reasoning (Auditor&#xED;a + Predictivo)</span>
+                            <span class="text-xs text-slate-400 mt-1 font-medium">Auditor&#xED;a e informe predictivo con reasoning mode.</span>
+                        </div>
+                    </label>
+                </div>
+            </div>
+            <!-- Right Panel -->
+            <div class="glass-panel col-span-1 lg:col-span-7 p-6 sm:p-8 flex flex-col h-[750px] relative">
+                <div class="flex items-center justify-between mb-2">
+                    <h2 class="text-xl font-bold text-white flex items-center">
+                        <div class="bg-emerald-500/10 p-2.5 rounded-xl mr-3 border border-emerald-500/20"><svg class="w-5 h-5 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg></div>
+                        Consolidaci&#xF3;n V5
+                    </h2>
+                    <span class="bg-white/5 px-3 py-1 rounded-full text-xs font-semibold text-slate-400 border border-white/10 hidden sm:block">Win32 + Grok</span>
+                </div>
+                <p class="text-sm text-slate-400/90 mb-5 font-medium">Sube reportes. <span class="text-amber-400">Arrastra para ordenar.</span></p>
+                <!-- Projects Dropzone -->
+                <div id="projects-dropzone" class="dropzone rounded-2xl p-6 mb-5 flex flex-col items-center justify-center cursor-pointer relative shadow-inner min-h-[100px]">
+                    <input type="file" id="projects-input" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-50" accept=".docx" multiple />
+                    <span class="text-emerald-300 font-semibold text-sm flex items-center z-0"><svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>Adicionar Seguimientos</span>
+                </div>
+                <ul id="sortable-list" class="space-y-3 flex-grow overflow-y-auto pr-3 custom-scrollbar pb-6"></ul>
+                <div class="absolute bottom-[108px] left-0 w-full h-16 bg-gradient-to-t from-[rgba(15,23,42,0.85)] to-transparent pointer-events-none rounded-b-xl"></div>
+                <!-- Generate -->
+                <div class="mt-auto pt-6 border-t border-white/10 z-10 w-full flex flex-col items-center">
+                    <button id="generate-btn" class="glow-button w-full bg-gradient-to-r from-amber-600 to-red-600 hover:from-amber-500 hover:to-red-500 text-white font-bold py-4 lg:py-5 px-8 rounded-2xl shadow-lg flex items-center justify-center border border-white/10">
+                        <svg class="w-6 h-6 mr-3 z-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                        <span class="z-10 text-lg md:text-xl tracking-wide">Ejecutar Ensamblaje V5 (Grok)</span>
+                    </button>
+                    <!-- Results Panel -->
+                    <div id="results-panel" class="hidden mt-5 w-full bg-[#1e293b]/90 p-5 border border-emerald-500/40 rounded-2xl shadow-lg backdrop-blur-xl">
+                        <h3 class="text-white font-bold mb-4 flex items-center"><span class="bg-emerald-500/20 p-1.5 rounded-md mr-2 text-emerald-400"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg></span>Operaci&#xF3;n V5 Completada</h3>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full">
+                            <div id="unified-downloads-container" class="flex flex-col gap-2">
+                                <a id="download-unified-word-btn" href="#" class="hidden items-center justify-center py-3 px-4 border border-emerald-500/50 rounded-xl text-sm font-bold text-emerald-300 bg-emerald-900/40 hover:bg-emerald-800/60 transition-all cursor-pointer group"><svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>PMO Unificado (Word)</a>
+                                <a id="download-unified-pdf-btn" href="#" class="hidden items-center justify-center py-3 px-4 border border-red-500/50 rounded-xl text-sm font-bold text-red-300 bg-red-900/40 hover:bg-red-800/60 transition-all cursor-pointer group"><svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3M3 17V7a2 2 0 012-2h6l2 2h6a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2z"></path></svg>PMO Unificado (PDF)</a>
+                                <a id="download-csv-btn" href="#" class="hidden items-center justify-center py-3 px-4 border border-amber-500/50 rounded-xl text-sm font-bold text-amber-300 bg-amber-900/40 hover:bg-amber-800/60 transition-all cursor-pointer group"><svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>CSV Links</a>
+                                <a id="download-links-docx-btn" href="#" class="hidden items-center justify-center py-3 px-4 border border-sky-500/50 rounded-xl text-sm font-bold text-sky-300 bg-sky-900/40 hover:bg-sky-800/60 transition-all cursor-pointer group"><svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"></path></svg>Evidencias (Word)</a>
+                            </div>
+                            <div id="ai-options-container" class="hidden flex-col gap-2">
+                                <a id="download-ai-btn" href="#" class="hidden items-center justify-center py-3 px-4 border border-amber-500/50 rounded-xl text-sm font-bold text-amber-200 bg-amber-900/40 hover:bg-amber-800/60 transition-all cursor-pointer group"><svg class="w-5 h-5 mr-1.5 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>Auditor&#xED;a Grok (PDF)</a>
+                                <a id="download-predictive-btn" href="#" class="hidden items-center justify-center py-3 px-4 border border-cyan-500/50 rounded-xl text-sm font-bold text-cyan-200 bg-cyan-900/40 hover:bg-cyan-800/60 transition-all cursor-pointer group"><svg class="w-5 h-5 mr-1.5 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path></svg>Predictivo (PDF)</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+    <!-- Footer -->
+    <footer class="w-full relative z-20 py-6 border-t border-white/5 mt-auto">
+        <div class="absolute inset-0 bg-black/40 backdrop-blur-md"></div>
+        <div class="relative flex flex-col items-center gap-2">
+            <span class="text-slate-500 font-medium text-xs tracking-wider">MOTOR V5 &#x2022; GROK 4.1 FAST REASONING</span>
+            <div class="flex items-center"><span class="text-slate-400 text-sm">Desarrollado por:</span><span class="ml-2 text-white font-extrabold tracking-[0.2em] text-sm">JAGA TECH</span></div>
+        </div>
+    </footer>
+    <!-- Loading Overlay -->
+    <div id="loading-overlay" class="fixed inset-0 bg-[#020617]/90 z-[100] hidden flex-col items-center justify-center">
+        <div class="mb-6">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 420" width="200" height="210">
+                <defs><style>
+                    .sombra-v5 { transform-origin: 200px 350px; animation: palpitar5 2.5s infinite ease-in-out; }
+                    @keyframes palpitar5 { 0%,100%{transform:scale(1);opacity:.3} 30%{transform:scale(.4);opacity:.05} 50%{transform:scale(.2);opacity:.02} 85%{transform:scale(1.3);opacity:.5} }
+                    .logo-v5 { transform-origin: 0px -55px; animation: acro5 2.5s infinite ease-in-out; }
+                    @keyframes acro5 { 0%{transform:translateY(0) scale(1) rotate(0)} 10%{transform:translateY(15px) scale(1.3,.7)} 30%{transform:translateY(-120px) scale(.8,1.2) rotate(180deg)} 50%{transform:translateY(-160px) rotate(360deg)} 70%{transform:translateY(-60px) rotate(540deg)} 85%{transform:translateY(20px) scale(1.4,.6) rotate(720deg)} 100%{transform:translateY(0) rotate(720deg)} }
+                </style></defs>
+                <ellipse cx="200" cy="350" rx="50" ry="10" fill="#f59e0b" class="sombra-v5"/>
+                <g transform="translate(200,350)"><g class="logo-v5"><circle cx="0" cy="-60" r="60" fill="#fff"/><image href="/static/logo_jaga.png" x="-50" y="-110" width="100" height="100"/></g></g>
+            </svg>
+        </div>
+        <h3 class="text-3xl font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-amber-300 via-red-300 to-fuchsia-300 mb-6">Procesando V5 Grok...</h3>
+        <div class="w-full max-w-lg mx-auto bg-black/40 p-6 rounded-2xl border border-white/10 shadow-2xl">
+            <div class="flex justify-between items-center text-sm text-slate-300 mb-3 font-medium">
+                <span id="progress-status-text" class="truncate pr-4 flex-1">Preparando Motor V5...</span>
+                <span id="progress-percentage" class="text-amber-400 font-bold">0%</span>
+            </div>
+            <div class="w-full bg-slate-800 rounded-full h-4 mb-4 overflow-hidden border border-slate-700/50">
+                <div id="progress-bar-fill" class="bg-gradient-to-r from-amber-500 to-red-500 h-full rounded-full transition-all duration-300 w-0 relative">
+                    <div class="absolute inset-0 bg-white/20 animate-[pulse_2s_ease-in-out_infinite]"></div>
+                </div>
+            </div>
+            <div id="error-ai-container" class="hidden mt-4 p-3 rounded-lg bg-red-900/30 border border-red-500/30">
+                <p id="error-ai-text" class="text-red-300 text-xs font-semibold flex items-start">
+                    <svg class="w-4 h-4 mr-1.5 flex-shrink-0 mt-0.5 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+                    <span></span>
+                </p>
+            </div>
+        </div>
+    </div>
+    <script src="/static/app_v5.js"></script>
+</body>
+</html>

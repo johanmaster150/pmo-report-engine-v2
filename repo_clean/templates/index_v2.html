@@ -1,0 +1,726 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JAGA TECH | Inteligencia PMO Documental</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap');
+
+        body {
+            font-family: 'Outfit', system-ui, sans-serif;
+            background: #0f172a;
+            background: radial-gradient(circle at 15% 50%, #17103a 0%, #080f1e 50%, #020617 100%);
+            background-attachment: fixed;
+            color: #f8fafc;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Glassmorphism Classes */
+        .glass-panel {
+            background: rgba(15, 23, 42, 0.45);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.6);
+            border-radius: 1.5rem;
+        }
+
+        .dropzone {
+            background: rgba(255, 255, 255, 0.02);
+            border: 2px dashed rgba(255, 255, 255, 0.15);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .dropzone:hover {
+            border-color: #818cf8;
+            background: rgba(129, 140, 248, 0.05);
+            transform: scale(1.01);
+            box-shadow: 0 0 20px rgba(99, 102, 241, 0.1);
+        }
+
+        .file-item {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 0.75rem;
+            transition: all 0.2s ease-out;
+        }
+
+        .file-item:hover {
+            transform: translateX(4px) translateY(-2px);
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(129, 140, 248, 0.4);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3), inset 0 0 10px rgba(99, 102, 241, 0.05);
+        }
+
+        /* Scrollbar */
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.1);
+            border-radius: 4px;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 4px;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        /* Toggle Switch */
+        .dot {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        input:checked~.dot {
+            transform: translateX(100%);
+            background-color: #ffffff;
+        }
+
+        input:checked~.block {
+            background-color: #6366f1;
+            border-color: #6366f1;
+            box-shadow: 0 0 12px rgba(99, 102, 241, 0.6);
+        }
+
+        /* Gradients */
+        .text-gradient {
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-image: linear-gradient(135deg, #818cf8, #d8b4fe);
+        }
+
+        .glow-button {
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .glow-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -150%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.25), transparent);
+            transform: skewX(-20deg);
+            transition: all 0.6s ease;
+        }
+
+        .glow-button:hover::before {
+            left: 150%;
+        }
+
+        .backdrop-overlay {
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+        }
+
+        /* Background Animated Orbs */
+        .bg-orb {
+            position: fixed;
+            border-radius: 50%;
+            filter: blur(80px);
+            z-index: -1;
+            animation: float 20s infinite alternate;
+        }
+
+        .bg-orb-1 {
+            width: 400px;
+            height: 400px;
+            background: rgba(79, 70, 229, 0.15);
+            /* Indigo */
+            top: -100px;
+            left: -100px;
+        }
+
+        .bg-orb-2 {
+            width: 500px;
+            height: 500px;
+            background: rgba(168, 85, 247, 0.1);
+            /* Purple */
+            bottom: -200px;
+            right: -100px;
+            animation-delay: -10s;
+        }
+
+        @keyframes float {
+            0% {
+                transform: translate(0, 0) scale(1);
+            }
+
+            50% {
+                transform: translate(50px, 30px) scale(1.1);
+            }
+
+            100% {
+                transform: translate(-30px, -50px) scale(0.9);
+            }
+        }
+    </style>
+</head>
+
+<body class="antialiased font-sans">
+
+    <!-- Navigation Banner -->
+    <div
+        class="w-full bg-indigo-900/50 text-indigo-200 text-center py-2 text-sm font-semibold tracking-wide border-b border-indigo-500/30">
+        MODO EXPERIMENTAL V2 ACTIVO (Inserción Nativa, TOC Links, CSV Enlaces).
+        <a href="/" class="ml-4 text-emerald-400 hover:text-emerald-300 underline">Volver al Método V1 (Copy/Paste)</a>
+        <a href="/v3" class="ml-4 text-blue-400 hover:text-blue-300 underline">Ir a V3 (Copia Formato)</a>
+        <a href="/v4" class="ml-4 text-fuchsia-400 hover:text-fuchsia-300 underline">Ir a V4 (Extraer Productos)</a>
+        <a href="/v5" class="ml-4 text-amber-400 hover:text-amber-300 underline">Ir a V5 (Grok Reasoning)</a>
+    </div>
+
+
+    <!-- Modal for PDF Viewer -->
+    <div id="pdf-modal"
+        class="fixed inset-0 z-[100] hidden bg-black/80 backdrop-blur-md flex-col items-center justify-center overflow-hidden">
+        <div
+            class="w-full max-w-6xl h-[90vh] flex flex-col bg-[#0f172a] border border-indigo-500/30 rounded-2xl shadow-2xl relative overflow-hidden">
+            <!-- Modal Header -->
+            <div
+                class="h-16 border-b border-indigo-500/20 bg-indigo-900/20 flex items-center justify-between px-6 shrink-0 z-10">
+                <h3 class="text-white font-bold text-lg flex items-center tracking-wide">
+                    <svg class="w-5 h-5 mr-2 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z">
+                        </path>
+                    </svg>
+                    Auditoría Inteligente (Vista Previa)
+                </h3>
+                <button id="close-pdf-modal"
+                    class="text-slate-400 hover:text-white bg-white/5 hover:bg-red-500/20 rounded-lg p-2 transition-colors">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12">
+                        </path>
+                    </svg>
+                </button>
+            </div>
+            <!-- Modal Content (PDF Embed) -->
+            <div class="flex-grow w-full relative bg-slate-900 flex items-center justify-center">
+                <div id="pdf-loading-spinner" class="absolute flex flex-col items-center text-indigo-300">
+                    <svg class="animate-spin h-10 w-10 mb-3" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"
+                            fill="none"></circle>
+                        <path class="opacity-75" fill="currentColor"
+                            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
+                        </path>
+                    </svg>
+                    <span>Cargando Documento Seguro...</span>
+                </div>
+                <!-- Important: Using iframe for PDF viewing works consistently across most modern browsers -->
+                <iframe id="pdf-iframe" src="" class="w-full h-full border-none relative z-10"
+                    onload="document.getElementById('pdf-loading-spinner').style.display='none';"></iframe>
+            </div>
+        </div>
+    </div>
+
+    <!-- Orbs for background depth -->
+    <div class="bg-orb bg-orb-1"></div>
+    <div class="bg-orb bg-orb-2"></div>
+
+    <!-- Header JAGA TECH -->
+    <header
+        class="w-full relative py-4 px-6 md:px-10 flex items-center justify-between border-b border-white/5 bg-black/30 backdrop-blur-2xl z-20 shadow-[0_4px_30px_rgba(0,0,0,0.5)]">
+        <div class="flex items-center gap-5">
+            <!-- Logo Box -->
+            <div
+                class="w-14 h-14 md:w-16 md:h-16 rounded-xl bg-gradient-to-br from-[#ffffff] to-[#e2e8f0] flex flex-col items-center justify-center shadow-[0_0_20px_rgba(255,255,255,0.05)] overflow-hidden relative group">
+                <!-- Replace static/img/logo.png with the actual file -->
+                <img src="/static/logo.png" alt="JAGA Logo"
+                    class="object-contain w-[85%] h-[85%] transition-transform duration-300 group-hover:scale-110"
+                    onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                <span style="display:none;"
+                    class="font-extrabold text-slate-900 text-[0.8rem] md:text-sm tracking-tighter flex-col items-center leading-none mt-1"><span>JAGA</span><span
+                        class="text-[0.6rem] md:text-[0.7rem] opacity-80">TECH</span></span>
+            </div>
+            <div class="flex flex-col">
+                <h1 class="text-2xl md:text-3xl font-bold tracking-tight text-white mb-0.5"
+                    style="font-family: 'Outfit', sans-serif;">Report <span class="text-gradient">Engine V2</span></h1>
+                <p class="text-[0.65rem] md:text-[0.70rem] text-indigo-300/80 font-bold tracking-[0.2em] uppercase">
+                    Alcaldía de Medellín • IA</p>
+            </div>
+        </div>
+        <div class="hidden sm:flex items-center">
+            <div
+                class="px-4 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-300 text-xs font-semibold tracking-wider flex items-center shadow-[0_0_15px_rgba(16,185,129,0.1)]">
+                <span
+                    class="w-2 h-2 rounded-full bg-emerald-400 mr-2 animate-pulse shadow-[0_0_8px_rgba(52,211,153,0.8)]"></span>
+                NÚCLEO V2 ACTIVO
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Workspace -->
+    <main class="flex-grow max-w-[1440px] w-full mx-auto p-4 sm:p-6 md:p-8 flex flex-col items-center z-10 w-full mt-4">
+
+        <div class="w-full grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 flex-grow items-stretch">
+
+            <!-- Panel Izquierdo: Configuración Core (Cols 1 to 5) -->
+            <div class="glass-panel col-span-1 lg:col-span-5 p-6 sm:p-8 flex flex-col h-full relative overflow-hidden">
+                <!-- Decorative SVG inside panel -->
+                <div class="absolute -top-10 -right-10 opacity-5 pointer-events-none transform rotate-12">
+                    <svg class="w-64 h-64" fill="currentColor" viewBox="0 0 24 24">
+                        <path
+                            d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z" />
+                    </svg>
+                </div>
+
+                <h2 class="text-xl md:text-2xl font-bold mb-2 text-white flex items-center relative z-10">
+                    <div class="bg-indigo-500/10 p-2.5 rounded-xl mr-3 border border-indigo-500/20 shadow-inner">
+                        <svg class="w-5 h-5 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                            stroke-linecap="round" stroke-linejoin="round" stroke-width="2">
+                            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                            <line x1="9" y1="3" x2="9" y2="21"></line>
+                        </svg>
+                    </div>
+                    Arquitectura
+                </h2>
+                <p class="text-sm text-slate-400/90 mb-8 font-medium relative z-10">Estructura y comportamiento del
+                    Ensamblador Win32.</p>
+
+                <div id="template-dropzone"
+                    class="dropzone rounded-2xl p-8 mb-6 flex flex-col items-center justify-center cursor-pointer relative shadow-inner z-10 min-h-[140px]">
+                    <input type="file" id="template-input"
+                        class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-50" accept=".docx" />
+                    <div
+                        class="bg-white/5 p-4 rounded-full mb-3 shadow-inner group-hover:scale-110 transition-transform">
+                        <svg class="w-7 h-7 text-indigo-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12">
+                            </path>
+                        </svg>
+                    </div>
+                    <span class="text-indigo-200 font-medium text-center text-sm md:text-base tracking-wide"
+                        id="template-name">Base_Unificada.docx (Subir)</span>
+                </div>
+
+                <!-- Selector de Modo de Ensamblaje -->
+                <div class="mb-6 relative z-10">
+                    <label
+                        class="block text-sm font-semibold text-slate-300 mb-2 uppercase tracking-wide">Enrutamiento</label>
+                    <div class="relative">
+                        <select id="assembly-mode-select"
+                            class="appearance-none bg-black/40 border border-slate-700/60 text-slate-200 text-sm font-medium rounded-xl focus:ring-indigo-500 focus:border-indigo-500 block w-full px-4 py-3.5 outline-none transition-all cursor-pointer shadow-inner">
+                            <option value="unified">Modelo Estándar (Secuencial Unificado)</option>
+                            <option value="split">Modelo Dividido (Paralelo a 2 Documentos)</option>
+                        </select>
+                        <div
+                            class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-slate-400">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M19 9l-7 7-7-7"></path>
+                            </svg>
+                        </div>
+                    </div>
+
+                    <div id="mode-unified-desc"
+                        class="bg-indigo-900/10 border border-indigo-500/10 rounded-xl p-3 md:p-4 mt-3 transition-all backdrop-blur-sm">
+                        <p class="text-[0.8rem] text-slate-400 leading-relaxed font-medium">Motor inyectará los archivos
+                            verticalmente dentro de la plantilla primaria conservando el índice y diseño maestro.</p>
+                    </div>
+                    <div id="mode-split-desc"
+                        class="bg-fuchsia-900/10 border border-fuchsia-500/10 rounded-xl p-3 md:p-4 mt-3 hidden transition-all backdrop-blur-sm">
+                        <p class="text-[0.8rem] text-fuchsia-200/80 leading-relaxed font-medium">El hilo separará los
+                            módulos de proyectos una vez detecte cruce de fases (Ej: Cierre Pago 1).</p>
+                    </div>
+                </div>
+
+                <!-- Plantilla 2 (Oculto) -->
+                <div id="template2-container"
+                    class="mb-6 hidden dropzone rounded-2xl p-6 flex-col items-center justify-center cursor-pointer relative min-h-[120px]">
+                    <input type="file" id="template2-input"
+                        class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-50" accept=".docx" />
+                    <span class="text-fuchsia-300 font-semibold text-center text-sm" id="template2-name">📌 Anexar:
+                        Plantilla_Maestra_Pago_2.docx</span>
+                </div>
+
+                <!-- Selector de Fuente (Tipografía) -->
+                <div class="mb-5 relative z-10 w-full rounded-xl p-4 bg-white/5 border border-white/5">
+                    <label class="block text-sm font-semibold text-slate-300 mb-2 uppercase tracking-wide">Manipulación
+                        Docx (Estilos)</label>
+                    <span class="text-xs text-emerald-400 mb-3 block font-medium">✓ Auto-erradicación de fondos
+                        gises/amarillos activada en el núcleo.</span>
+                    <div class="relative">
+                        <select id="font-family-select"
+                            class="appearance-none bg-black/40 border border-slate-700/60 text-slate-200 text-sm font-medium rounded-xl focus:ring-indigo-500 focus:border-indigo-500 block w-full px-4 py-3 outline-none transition-all cursor-pointer">
+                            <option value="default">Dejar por defecto (Sin forzar sobreescritura)</option>
+                            <option value="Arial">Consolidar todo en Arial</option>
+                            <option value="Calibri">Consolidar todo en Calibri</option>
+                            <option value="Times New Roman">Consolidar todo en Times New Roman</option>
+                            <option value="Verdana">Consolidar todo en Verdana</option>
+                            <option value="Tahoma">Consolidar todo en Tahoma</option>
+                        </select>
+                        <div
+                            class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-slate-400">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M19 9l-7 7-7-7"></path>
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Selector Formato de Exportación -->
+                <div class="mb-5 relative z-10 w-full rounded-xl p-4 bg-white/5 border border-white/5">
+                    <label class="block text-sm font-semibold text-slate-300 mb-2 uppercase tracking-wide">Formato de
+                        Salida Unificado</label>
+                    <div class="relative">
+                        <select id="export-format-select"
+                            class="appearance-none bg-black/40 border border-slate-700/60 text-slate-200 text-sm font-medium rounded-xl focus:ring-emerald-500 focus:border-emerald-500 block w-full px-4 py-3 outline-none transition-all cursor-pointer">
+                            <option value="both">Word (.docx) y PDF Ambos</option>
+                            <option value="pdf">Solo Adobe PDF (.pdf)</option>
+                            <option value="word">Solo Microsoft Word (.docx)</option>
+                        </select>
+                        <div
+                            class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-slate-400">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M19 9l-7 7-7-7"></path>
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex-grow"></div>
+
+                <!-- Integración IA OpenRouter -->
+                <div
+                    class="mt-4 p-5 rounded-2xl bg-gradient-to-br from-[#1e1a3b] to-[#120d2b] border border-[#3c2a6b] relative z-10 shadow-lg">
+                    <label class="flex items-start cursor-pointer group">
+                        <div class="relative mt-1">
+                            <input type="checkbox" id="ai-toggle" class="sr-only">
+                            <div
+                                class="block bg-slate-800 border border-slate-700 w-12 h-6 rounded-full transition-colors">
+                            </div>
+                            <div
+                                class="dot absolute left-1 top-1 bg-white w-4 h-4 rounded-full transition transform shadow-md">
+                            </div>
+                        </div>
+                        <div class="ml-4 flex flex-col">
+                            <span
+                                class="text-sm font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-indigo-400 flex items-center tracking-wide">
+                                <svg class="w-4 h-4 mr-1.5 text-purple-400" fill="none" stroke="currentColor"
+                                    viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z">
+                                    </path>
+                                </svg>
+                                OpenRouter Auditoría IA
+                            </span>
+                            <span class="text-xs text-slate-400 mt-1.5 font-medium leading-[1.6]">
+                                Escanea el contenido de todos los proyectos y ejecuta inferencia LLM en la nube para
+                                devolver un anexo PDF de la auditoría.
+                            </span>
+                        </div>
+                    </label>
+                </div>
+            </div>
+
+            <!-- Panel Derecho: Proyectos (Cols 6 to 12) -->
+            <div class="glass-panel col-span-1 lg:col-span-7 p-6 sm:p-8 flex flex-col h-[750px] relative">
+
+                <div class="flex items-center justify-between mb-2">
+                    <h2 class="text-xl md:text-2xl font-bold text-white flex items-center">
+                        <div class="bg-emerald-500/10 p-2.5 rounded-xl mr-3 border border-emerald-500/20 shadow-inner">
+                            <svg class="w-5 h-5 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z">
+                                </path>
+                            </svg>
+                        </div>
+                        Consolidación V2 (InsertFile)
+                    </h2>
+                    <span
+                        class="bg-white/5 px-3 py-1 rounded-full text-xs font-semibold text-slate-400 border border-white/10 hidden sm:block">Win32
+                        API Binding</span>
+                </div>
+                <p class="text-sm text-slate-400/90 mb-5 font-medium">Envía los reportes para su ensamblaje unificado.
+                    <span class="text-emerald-400">Arrastra arriba/abajo para ordenar la inyección.</span>
+                </p>
+
+                <!-- Zona para arrastrar archivos -->
+                <div id="projects-dropzone"
+                    class="dropzone rounded-2xl p-6 mb-5 flex flex-col items-center justify-center cursor-pointer relative shadow-inner min-h-[100px]">
+                    <input type="file" id="projects-input"
+                        class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-50" accept=".docx" multiple />
+                    <span
+                        class="text-emerald-300 font-semibold text-center text-sm md:text-base tracking-wide flex items-center relative z-0">
+                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4">
+                            </path>
+                        </svg>
+                        Adicionar Seguimientos (Múltiple)
+                    </span>
+                </div>
+
+                <!-- Lista Ordenable -->
+                <ul id="sortable-list" class="space-y-3 flex-grow overflow-y-auto pr-3 custom-scrollbar pb-6">
+                    <!-- Javascript will populate this based on dragged items -->
+                </ul>
+
+                <!-- Degradado Inferior de la lista para ocultar el corte bruzco -->
+                <div
+                    class="absolute bottom-[108px] left-0 w-full h-16 bg-gradient-to-t from-[rgba(15,23,42,0.85)] to-transparent pointer-events-none rounded-b-xl">
+                </div>
+
+                <!-- Controles Principales (Botón Generar) -->
+                <div class="mt-auto pt-6 border-t border-white/10 relative z-10 w-full flex flex-col items-center">
+
+                    <button id="generate-btn"
+                        class="glow-button w-full relative overflow-hidden bg-gradient-to-r from-emerald-600 to-indigo-600 hover:from-emerald-500 hover:to-indigo-500 text-white font-bold py-4 lg:py-5 px-8 rounded-2xl shadow-[0_10px_30px_rgba(99,102,241,0.25)] hover:shadow-[0_10px_40px_rgba(99,102,241,0.4)] transform flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed border border-white/10">
+                        <svg class="w-6 h-6 mr-3 relative z-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                        </svg>
+                        <span class="relative z-10 text-lg md:text-xl tracking-wide">Ejecutar Ensamblaje Win32</span>
+                    </button>
+
+                    <!-- Panel de Resultados de Descarga -->
+                    <div id="results-panel"
+                        class="hidden mt-5 w-full bg-[#1e293b]/90 p-5 md:p-6 border border-emerald-500/40 rounded-2xl shadow-[0_10px_30px_rgba(0,0,0,0.5)] backdrop-blur-xl">
+                        <h3 class="text-white text-base md:text-lg font-bold mb-4 flex items-center"><span
+                                class="bg-emerald-500/20 p-1.5 rounded-md mr-2 text-emerald-400"><svg class="w-5 h-5"
+                                    fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M5 13l4 4L19 7"></path>
+                                </svg></span> Operación Completada Exitosamente</h3>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full mb-4">
+                            <!-- Descarga PMO Unificado -->
+                            <div id="unified-downloads-container" class="flex flex-col gap-2">
+                                <a id="download-unified-word-btn" href="#" target="_blank"
+                                    class="hidden items-center justify-center py-3.5 px-4 border border-emerald-500/50 rounded-xl shadow-lg text-sm font-bold text-emerald-300 bg-emerald-900/40 hover:bg-emerald-800/60 hover:text-emerald-100 transition-all cursor-pointer group">
+                                    <svg class="w-4 h-4 mr-2 group-hover:scale-125 transition-transform" fill="none"
+                                        stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+                                    </svg>
+                                    PMO Unificado (Word)
+                                </a>
+                                <a id="download-unified-pdf-btn" href="#" target="_blank"
+                                    class="hidden items-center justify-center py-3.5 px-4 border border-red-500/50 rounded-xl shadow-lg text-sm font-bold text-red-300 bg-red-900/40 hover:bg-red-800/60 hover:text-red-100 transition-all cursor-pointer group">
+                                    <svg class="w-4 h-4 mr-2 group-hover:scale-125 transition-transform" fill="none"
+                                        stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M12 10v6m0 0l-3-3m3 3l3-3M3 17V7a2 2 0 012-2h6l2 2h6a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2z">
+                                        </path>
+                                    </svg>
+                                    PMO Unificado (PDF)
+                                </a>
+                                <!-- CSV de Evidencias -->
+                                <a id="download-csv-btn" href="#" target="_blank"
+                                    class="hidden items-center justify-center py-3.5 px-4 border border-amber-500/50 rounded-xl shadow-lg text-sm font-bold text-amber-300 bg-amber-900/40 hover:bg-amber-800/60 hover:text-amber-100 transition-all cursor-pointer group">
+                                    <svg class="w-4 h-4 mr-2 group-hover:scale-125 transition-transform" fill="none"
+                                        stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                                    </svg>
+                                    CSV Links y Evidencias
+                                </a>
+                                <!-- DOCX de Evidencias -->
+                                <a id="download-links-docx-btn" href="#" target="_blank"
+                                    class="hidden items-center justify-center py-3.5 px-4 border border-sky-500/50 rounded-xl shadow-lg text-sm font-bold text-sky-300 bg-sky-900/40 hover:bg-sky-800/60 hover:text-sky-100 transition-all cursor-pointer group">
+                                    <svg class="w-4 h-4 mr-2 group-hover:scale-125 transition-transform" fill="none"
+                                        stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"></path>
+                                    </svg>
+                                    Listado de Evidencias (Word)
+                                </a>
+                            </div>
+
+                            <!-- Opciones IA: Auditoría + Predictivo -->
+                            <div id="ai-options-container" class="hidden flex-col gap-2">
+                                <a id="download-ai-btn" href="#" target="_blank"
+                                    class="hidden items-center justify-center py-3.5 px-4 border border-[#c084fc]/50 rounded-xl shadow-lg text-sm font-bold text-[#e9d5ff] bg-[#581c87]/40 hover:bg-[#6b21a8]/60 hover:text-white transition-all cursor-pointer group relative overflow-hidden">
+                                    <span
+                                        class="absolute top-0 right-0 w-8 h-8 bg-purple-400 blur-xl opacity-30 group-hover:opacity-60 transition-opacity"></span>
+                                    <svg class="w-5 h-5 mr-1.5 group-hover:scale-125 transition-transform text-[#c084fc]"
+                                        fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+                                    </svg>
+                                    Descargar Auditoría IA (PDF)
+                                </a>
+                                <a id="download-predictive-btn" href="#" target="_blank"
+                                    class="hidden items-center justify-center py-3.5 px-4 border border-cyan-500/50 rounded-xl shadow-lg text-sm font-bold text-cyan-200 bg-cyan-900/40 hover:bg-cyan-800/60 hover:text-white transition-all cursor-pointer group relative overflow-hidden">
+                                    <span
+                                        class="absolute top-0 right-0 w-8 h-8 bg-cyan-400 blur-xl opacity-30 group-hover:opacity-60 transition-opacity"></span>
+                                    <svg class="w-5 h-5 mr-1.5 group-hover:scale-125 transition-transform text-cyan-400"
+                                        fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
+                                    </svg>
+                                    Descargar Informe Predictivo (PDF)
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Footer Elegante -->
+    <footer class="w-full relative z-20 py-6 md:py-8 border-t border-white/5 mt-auto">
+        <div class="absolute inset-0 bg-black/40 backdrop-blur-md"></div>
+        <div class="relative flex flex-col items-center justify-center gap-2">
+            <span class="text-slate-500 font-medium text-xs tracking-wider">PLATAFORMA ARQUITECTÓNICA</span>
+            <div class="flex items-center">
+                <span class="text-slate-400 text-sm">Desarrollado por:</span>
+                <span
+                    class="ml-2 text-white font-extrabold tracking-[0.2em] text-sm flex items-center bg-clip-text text-transparent bg-gradient-to-r from-slate-100 to-slate-400">JAGA
+                    TECH</span>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Modal de Carga (Overlay con Glassmorphism + Logo Animado) -->
+    <div id="loading-overlay"
+        class="fixed inset-0 bg-[#020617]/90 backdrop-overlay z-[100] hidden flex-col items-center justify-center transition-all duration-500">
+
+        <!-- Logo Animado JAGA TECH con Acrobacias -->
+        <div class="mb-6">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 420" width="200" height="210">
+                <defs>
+                    <style>
+                        .sombra-loading {
+                            transform-origin: 200px 350px;
+                            animation: palpitar-sombra-v2 2.5s infinite ease-in-out;
+                        }
+
+                        @keyframes palpitar-sombra-v2 {
+
+                            0%,
+                            100% {
+                                transform: scale(1);
+                                opacity: 0.3;
+                            }
+
+                            10% {
+                                transform: scale(1.2);
+                                opacity: 0.4;
+                            }
+
+                            30% {
+                                transform: scale(0.4);
+                                opacity: 0.05;
+                            }
+
+                            50% {
+                                transform: scale(0.2);
+                                opacity: 0.02;
+                            }
+
+                            70% {
+                                transform: scale(0.5);
+                                opacity: 0.1;
+                            }
+
+                            85% {
+                                transform: scale(1.3);
+                                opacity: 0.5;
+                            }
+                        }
+
+                        .logo-animado-loading {
+                            transform-origin: 0px -55px;
+                            animation: acrobacias-v2 2.5s infinite ease-in-out;
+                        }
+
+                        @keyframes acrobacias-v2 {
+                            0% {
+                                transform: translateY(0px) scale(1, 1) rotate(0deg);
+                            }
+
+                            10% {
+                                transform: translateY(15px) scale(1.3, 0.7) rotate(0deg);
+                            }
+
+                            30% {
+                                transform: translateY(-120px) scale(0.8, 1.2) rotate(180deg);
+                            }
+
+                            50% {
+                                transform: translateY(-160px) scale(1, 1) rotate(360deg);
+                            }
+
+                            70% {
+                                transform: translateY(-60px) scale(0.9, 1.1) rotate(540deg);
+                            }
+
+                            85% {
+                                transform: translateY(20px) scale(1.4, 0.6) rotate(720deg);
+                            }
+
+                            95% {
+                                transform: translateY(-5px) scale(0.95, 1.05) rotate(720deg);
+                            }
+
+                            100% {
+                                transform: translateY(0px) scale(1, 1) rotate(720deg);
+                            }
+                        }
+                    </style>
+                </defs>
+                <!-- Sombra en el suelo -->
+                <ellipse cx="200" cy="350" rx="50" ry="10" fill="#6366f1" class="sombra-loading" />
+                <!-- Grupo animado con logo -->
+                <g transform="translate(200, 350)">
+                    <g class="logo-animado-loading">
+                        <!-- Fondo blanco para que resalte el logo negro -->
+                        <circle cx="0" cy="-60" r="60" fill="#ffffff" />
+                        <image href="/static/logo_jaga.png" x="-50" y="-110" width="100" height="100" />
+                    </g>
+                </g>
+            </svg>
+        </div>
+
+        <h3
+            class="text-3xl font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-emerald-300 via-indigo-300 to-fuchsia-300 mb-6 tracking-tight">
+            Procesando Operación...</h3>
+
+        <div class="w-full max-w-lg mx-auto bg-black/40 p-6 rounded-2xl border border-white/10 shadow-2xl">
+            <div class="flex justify-between items-center text-sm text-slate-300 mb-3 font-medium">
+                <span id="progress-status-text" class="truncate pr-4 flex-1">Preparando Motor PMO...</span>
+                <span id="progress-percentage" class="text-emerald-400 font-bold">0%</span>
+            </div>
+
+            <div
+                class="w-full bg-slate-800 rounded-full h-4 mb-4 overflow-hidden shadow-inner border border-slate-700/50">
+                <div id="progress-bar-fill"
+                    class="bg-gradient-to-r from-emerald-500 to-indigo-500 h-full rounded-full transition-all duration-300 w-0 relative">
+                    <div class="absolute inset-0 bg-white/20 animate-[pulse_2s_ease-in-out_infinite]"></div>
+                </div>
+            </div>
+
+            <div id="error-ai-container" class="hidden mt-4 p-3 rounded-lg bg-red-900/30 border border-red-500/30">
+                <p id="error-ai-text" class="text-red-300 text-xs font-semibold break-words flex items-start">
+                    <svg class="w-4 h-4 mr-1.5 flex-shrink-0 mt-0.5 text-red-400" fill="none" stroke="currentColor"
+                        viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z">
+                        </path>
+                    </svg>
+                    <span></span>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <script src="/static/app_v2.js"></script>
+</body>

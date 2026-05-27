@@ -1,0 +1,29 @@
+# ==========================================
+# Docker Compose — JAGA TECH Report Engine V5 Linux
+# ==========================================
+
+services:
+  report-engine:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: jaga-report-engine-v5
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    volumes:
+      - report_uploads:/app/uploads
+      - report_output:/app/output
+    environment:
+      - PORT=8080
+      - HOST=0.0.0.0
+      - PYTHONUNBUFFERED=1
+    healthcheck:
+      test: ["CMD", "python3", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8080/health')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+volumes:
+  report_uploads:
+  report_output:
